@@ -7,10 +7,10 @@ def ingest(event, context):
     fg = FeedGenerator()
 
     fg.id('http://lernfunk.de/media/654321')
-    fg.title(file.name)
-    fg.author({'name': 'John Doe', 'email': 'john@example.de'})
+    fg.title(file['name'])
+    fg.author({'name': 'Mitch Test', 'email': 'Mitch@example.com'})
     fg.link(href=file['mediaLink'], rel='alternate')
-    fg.logo('http://ex.com/logo.jpg')
+    fg.logo('http://test')
     fg.subtitle('This is a cool feed!')
     fg.link(href=file['selfLink'], rel='self')
     fg.language('en')
