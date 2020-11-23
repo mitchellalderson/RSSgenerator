@@ -10,9 +10,10 @@ def ingest(event, context):
     file = event
     bucket_name = file['bucket']
     storage_client = storage.Client()
+    print("bucket name: " + bucket_name)
 
     blobs = storage_client.list_blobs(bucket_name, prefix='audio')
-
+    print("blob name: " + blobs)
     for blob in blobs:
         print(blob.name)
 
