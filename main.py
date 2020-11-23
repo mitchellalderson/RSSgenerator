@@ -14,7 +14,7 @@ test1 = {
 def ingest(event, context):
     file = event
     getLocalFile = get(file['mediaLink'])
-    LocalFile = tempfile.NamedTemporaryFile(suffix=None)
+    LocalFile = tempfile.NamedTemporaryFile(suffix='.mp3')
     LocalFile.write(getLocalFile.content)
     LocalFile.seek(0)
 
@@ -43,4 +43,4 @@ def ingest(event, context):
     print("file output complete")
 
 
-#ingest(test1, "null")
+ingest(test1, "null")
