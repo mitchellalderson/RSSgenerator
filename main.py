@@ -1,20 +1,26 @@
 from feedgen.feed import FeedGenerator
 import audio_metadata
+from requests import get
+import tempfile
 
 test1 = {
     "name": "test",
     "mediaLink":
-    "https://storage.googleapis.com/elfpodstore/Audio/broken-shovel.mp3",
+    "https://storage.googleapis.com/elfpodstore/Audio/untitled.mp3",
     "selfLink": "testURLself"
 }
 
 
 def ingest(event, context):
     file = event
-    fileLocation = file['mediaLink']
-    print(fileLocation)
-    fileMeta = audio_metadata.load(fileLocation)
-    print(fileMeta)
+    getLocalFile = get(file['mediaLink'])
+    LocalFile = tempfile.NamedTemporaryFile(suffix=None)
+    LocalFile.write(getLocalFile.content)
+    LocalFile.seek(0)
+
+    fileMeta = audio_metadata.load(LocalFile.name)
+    print("Artist name is: " + str(fileMeta.tags['artist']))
+
     fg = FeedGenerator()
 
     fg.id('http://lernfunk.de/media/654321')
@@ -35,3 +41,6 @@ def ingest(event, context):
     #fg.rss_file('rss.xml')  # Write the RSS feed to a file
 
     print("file output complete")
+
+
+ingest(test1, "null")
