@@ -20,7 +20,7 @@ def ingest(event, context):
 
     fileMeta = audio_metadata.load(LocalFile.name)
     print("Artist name is: " + str(fileMeta.tags['artist']))
-
+    print(fileMeta)
     fg = FeedGenerator()
 
     fg.id('http://lernfunk.de/media/654321')
@@ -43,4 +43,4 @@ def ingest(event, context):
     print("file output complete")
 
 
-ingest(test1, "null")
+#ingest(test1, "null")
