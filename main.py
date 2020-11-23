@@ -51,7 +51,7 @@ def ingest(event, context):
     fe.enclosure(str(file['mediaLink']), 0, 'audio/mpeg')
 
     rssfeed = fg.rss_str(pretty=True)  # Get the RSS feed as string
-    fg.rss_file('rss.xml')  # Write the RSS feed to a file
+    #fg.rss_file('rss.xml')  # Write the RSS feed to a file
 
 
 test1 = {
