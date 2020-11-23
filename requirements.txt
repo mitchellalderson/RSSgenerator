@@ -3,3 +3,4 @@ google-cloud-storage>=1.33.0
 feedgen>=0.9.0
 audio_metadata>=0.11.0
 requests>=2.25.0
+google.cloud>=0.34.0
