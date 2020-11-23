@@ -43,4 +43,4 @@ def ingest(event, context):
     print("file output complete")
 
 
-ingest(test1, "null")
+#ingest(test1, "null")
