@@ -8,10 +8,10 @@ from google.cloud import storage
 def ingest(event, context):
 
     file = event
-    bucket = file.bucket
+    bucket_name = file.bucket
     storage_client = storage.Client()
 
-    blobs = storage_client.list_blobs(bucket_name)
+    blobs = storage_client.list_blobs(bucket_name, prefix='audio')
 
     for blob in blobs:
         print(blob.name)
