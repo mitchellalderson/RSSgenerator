@@ -8,7 +8,7 @@ from google.cloud import storage
 def ingest(event, context):
 
     file = event
-    bucket_name = file.bucket
+    bucket_name = file['bucket']
     storage_client = storage.Client()
 
     blobs = storage_client.list_blobs(bucket_name, prefix='audio')
