@@ -13,7 +13,8 @@ def ingest(event, context):
     print("bucket name: " + bucket_name)
 
     blobs = storage_client.list_blobs(bucket_name, prefix='audio')
-    print("blob name: " + blobs)
+    print("blobs:")
+    print(blobs)
     for blob in blobs:
         print(blob.name)
 
