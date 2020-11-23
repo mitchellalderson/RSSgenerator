@@ -12,7 +12,7 @@ def ingest(event, context):
     storage_client = storage.Client()
     print("bucket name: " + bucket_name)
 
-    blobs = storage_client.list_blobs(bucket_name, prefix='audio')
+    blobs = storage_client.list_blobs(bucket_name, prefix='Audio')
     print("blobs:")
     FileList = []
 
@@ -62,5 +62,7 @@ def FeedFileGen(FileList):
     rssfeed = fg.rss_str(pretty=True)  # Get the RSS feed as string
     #fg.rss_file('rss.xml')  # Write the RSS feed to a file
 
+
+test1 = {"bucket": "elfpodstore"}
 
 #ingest(test1, "null")
