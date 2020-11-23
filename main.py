@@ -14,9 +14,16 @@ def ingest(event, context):
 
     blobs = storage_client.list_blobs(bucket_name, prefix='audio')
     print("blobs:")
-    print(blobs)
+    FileList = []
+
     for blob in blobs:
         print(blob.name)
+        FileList.append(blob.name)
+
+    print(FileList)
+
+
+def FeedFileGen(FileList):
 
     getLocalFile = get(file['mediaLink'])
     LocalFile = tempfile.NamedTemporaryFile(suffix='.mp3')
@@ -55,12 +62,5 @@ def ingest(event, context):
     rssfeed = fg.rss_str(pretty=True)  # Get the RSS feed as string
     #fg.rss_file('rss.xml')  # Write the RSS feed to a file
 
-
-test1 = {
-    "name": "test",
-    "mediaLink":
-    "https://storage.googleapis.com/elfpodstore/Audio/untitled.mp3",
-    "selfLink": "testURLself"
-}
 
 #ingest(test1, "null")
