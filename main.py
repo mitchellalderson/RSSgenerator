@@ -69,14 +69,12 @@ def FeedFileGen(FileList):
         fe.enclosure(str(FileListItem), 0, 'audio/mpeg')
         LocalFile.close()
     rssfeed = fg.rss_str(pretty=True)  # Get the RSS feed as string
-    print(rssfeed)
     uploadBucket = storage_client.bucket('elfpodxml')
     uploadBlob = uploadBucket.blob('rss.xml')
 
     localUploadFile = tempfile.NamedTemporaryFile(suffix='.xml')
     localUploadFile.write(bytes(rssfeed))
     localUploadFile.seek(0)
-    print(localUploadFile)
     # Write the RSS feed to a file
 
     uploadBlob.upload_from_file(localUploadFile)
