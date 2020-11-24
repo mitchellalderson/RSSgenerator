@@ -3,10 +3,10 @@ import audio_metadata
 from requests import get
 import tempfile
 from google.cloud import storage
-import os
+#import os
 #import memory_profiler
-os.environ[
-    'GOOGLE_APPLICATION_CREDENTIALS'] = '/Users/mitchellalderson/Documents/WebDev/RSS/rsscreatortest-2e1edcb21dfc.json'
+#os.environ[
+#   'GOOGLE_APPLICATION_CREDENTIALS'] = '/Users/mitchellalderson/Documents/WebDev/RSS/rsscreatortest-2e1edcb21dfc.json'
 
 storage_client = storage.Client()
 
@@ -15,7 +15,7 @@ def ingest(event, context):
 
     file = event
     bucket_name = file['bucket']
-    print("bucket name: " + bucket_name)
+    #print("bucket name: " + bucket_name)
 
     blobs = storage_client.list_blobs(
         bucket_name,
@@ -69,20 +69,20 @@ def FeedFileGen(FileList):
         fe.enclosure(str(FileListItem), 0, 'audio/mpeg')
         LocalFile.close()
     rssfeed = fg.rss_str(pretty=True)  # Get the RSS feed as string
-    print(rssfeed)
+    #print(rssfeed)
     uploadBucket = storage_client.bucket('elfpodxml')
     uploadBlob = uploadBucket.blob('rss.xml')
 
     localUploadFile = tempfile.NamedTemporaryFile(suffix='.xml')
     localUploadFile.write(bytes(rssfeed))
     localUploadFile.seek(0)
-    print(localUploadFile)
+    #print(localUploadFile)
     # Write the RSS feed to a file
     metadata = 'no-cache, max-age=0'
     uploadBlob.cache_control = metadata
     uploadBlob.upload_from_file(localUploadFile)
 
 
-test1 = {"bucket": "elfpodstore"}
+#test1 = {"bucket": "elfpodstore"}
 
-ingest(test1, "null")
+#ingest(test1, "null")
