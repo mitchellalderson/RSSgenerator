@@ -15,14 +15,17 @@ def ingest(event, context):
     storage_client = storage.Client()
     print("bucket name: " + bucket_name)
 
-    blobs = storage_client.list_blobs(bucket_name)
+    blobs = storage_client.list_blobs(
+        bucket_name,
+        prefix='Audio/mp3/',
+    )
     print("blobs:")
     FileList = []
 
     for blob in blobs:
         print(blob.name)
         FileList.append(blob.public_url)
-
+    FileList.pop(0)
     print(FileList)
     FeedFileGen(FileList)
 
