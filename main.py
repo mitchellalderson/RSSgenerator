@@ -3,10 +3,18 @@ import audio_metadata
 from requests import get
 import tempfile
 from google.cloud import storage
-#import os
+import os
 #import memory_profiler
 #os.environ[
 #   'GOOGLE_APPLICATION_CREDENTIALS'] = '/Users/mitchellalderson/Documents/WebDev/RSS/rsscreatortest-2e1edcb21dfc.json'
+
+Client_URL = os.environ.get('Client_URL')
+Channel_Title = os.environ.get('Channel_Title')
+Logo_URL = os.environ.get('Logo_URL')
+Channel_Subtitle = os.environ.get('Channel_Subtitle')
+Itunes_Category = os.environ.get('Itunes_Category')
+XML_Upload_Location = os.environ.get('XML_Upload_Location')
+Channel_Author = os.environ.get('Channel_Author')
 
 storage_client = storage.Client()
 
@@ -35,20 +43,17 @@ def FeedFileGen(FileList):
 
     fg = FeedGenerator()
     fg.load_extension('podcast')
-    fg.id("https://elf.church/")
-    fg.title("Evening Light Fellowship Archive")
-    fg.author({
-        'name': 'Evening Light Fellowship',
-        'email': 'Mitch@example.com'
-    })
-    fg.link(href="https://elf.church/", rel='alternate')
-    fg.logo('https://storage.googleapis.com/elfpodxml/Logo.png')
-    fg.subtitle('Podcast Archive of Evening Light Fellowship Services')
-    fg.link(href="https://elf.church/", rel='self')
+    fg.id(Client_URL)
+    fg.title(Channel_Title)
+    fg.author(Channel_Author)
+    fg.link(href=Client_URL, rel='alternate')
+    fg.logo(Logo_URL)
+    fg.subtitle(Channel_Subtitle)
+    fg.link(href=Client_URL, rel='self')
     fg.language('en')
     fg.generator('Faraway Southwest LLC RSS Generator')
     fg.podcast.itunes_explicit('no')
-    fg.podcast.itunes_category('Religion & Spirituality', 'Christianity')
+    fg.podcast.itunes_category(Itunes_Category)
 
     #atomfeed = fg.atom_str(pretty=True)  # Get the ATOM feed as string
 
@@ -70,7 +75,7 @@ def FeedFileGen(FileList):
         LocalFile.close()
     rssfeed = fg.rss_str(pretty=True)  # Get the RSS feed as string
 
-    uploadBucket = storage_client.bucket('elfpodxml')
+    uploadBucket = storage_client.bucket(XML_Upload_Location)
     uploadBlob = uploadBucket.blob('rss.xml')
 
     localUploadFile = tempfile.NamedTemporaryFile(suffix='.xml')
@@ -81,7 +86,10 @@ def FeedFileGen(FileList):
     metadata = 'no-cache, max-age=0'
     uploadBlob.cache_control = metadata
     uploadBlob.upload_from_file(localUploadFile)
+    localUploadFile.close()
 
+
+#TODO: probably need some kind of memory cleanup?
 
 #test1 = {"bucket": "elfpodstore"}
 
