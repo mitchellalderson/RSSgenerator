@@ -3,6 +3,9 @@ import audio_metadata
 from requests import get
 import tempfile
 from google.cloud import storage
+import os
+os.environ[
+    'GOOGLE_APPLICATION_CREDENTIALS'] = '/Users/mitchellalderson/Documents/WebDev/RSS/rsscreatortest-2e1edcb21dfc.json'
 
 
 def ingest(event, context):
@@ -12,27 +15,19 @@ def ingest(event, context):
     storage_client = storage.Client()
     print("bucket name: " + bucket_name)
 
-    blobs = storage_client.list_blobs(bucket_name,
-                                      prefix='Audio',
-                                      delimiter='/')
+    blobs = storage_client.list_blobs(bucket_name)
     print("blobs:")
     FileList = []
 
     for blob in blobs:
         print(blob.name)
-        FileList.append(blob)
+        FileList.append(blob.public_url)
 
     print(FileList)
+    FeedFileGen(FileList)
 
 
 def FeedFileGen(FileList):
-
-    getLocalFile = get(file['mediaLink'])
-    LocalFile = tempfile.NamedTemporaryFile(suffix='.mp3')
-    LocalFile.write(getLocalFile.content)
-    LocalFile.seek(0)
-
-    fileMeta = audio_metadata.load(LocalFile.name)
 
     fg = FeedGenerator()
     fg.load_extension('podcast')
@@ -55,16 +50,24 @@ def FeedFileGen(FileList):
 
     #fg.atom_file('atom.xml')  # Write the ATOM feed to a file
 
-    fe = fg.add_entry()
-    fe.id(str(file['mediaLink']))
-    fe.title(str(fileMeta.tags['title']).strip('\'\[\]'))
-    fe.description(str(fileMeta.tags['artist']).strip('\'\[\]'))
-    fe.enclosure(str(file['mediaLink']), 0, 'audio/mpeg')
+    for FileListItem in FileList:
+        getLocalFile = get(FileListItem)
+        LocalFile = tempfile.NamedTemporaryFile(suffix='.mp3')
+        LocalFile.write(getLocalFile.content)
+        LocalFile.seek(0)
+
+        fileMeta = audio_metadata.load(LocalFile.name)
+
+        fe = fg.add_entry()
+        fe.id(str(FileListItem))
+        fe.title(str(fileMeta.tags['title']).strip('\'\[\]'))
+        fe.description(str(fileMeta.tags['artist']).strip('\'\[\]'))
+        fe.enclosure(str(FileListItem), 0, 'audio/mpeg')
 
     rssfeed = fg.rss_str(pretty=True)  # Get the RSS feed as string
-    #fg.rss_file('rss.xml')  # Write the RSS feed to a file
+    fg.rss_file('rss.xml')  # Write the RSS feed to a file
 
 
 test1 = {"bucket": "elfpodstore"}
 
-#ingest(test1, "null")
+ingest(test1, "null")
