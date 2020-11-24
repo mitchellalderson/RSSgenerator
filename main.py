@@ -4,17 +4,19 @@ from requests import get
 import tempfile
 from google.cloud import storage
 import os
+#from dotenv import load_dotenv
+import ast
 #import memory_profiler
 #os.environ[
 #   'GOOGLE_APPLICATION_CREDENTIALS'] = '/Users/mitchellalderson/Documents/WebDev/RSS/rsscreatortest-2e1edcb21dfc.json'
-
+#load_dotenv()
 Client_URL = os.environ.get('Client_URL')
 Channel_Title = os.environ.get('Channel_Title')
 Logo_URL = os.environ.get('Logo_URL')
 Channel_Subtitle = os.environ.get('Channel_Subtitle')
 Itunes_Category = os.environ.get('Itunes_Category')
 XML_Upload_Location = os.environ.get('XML_Upload_Location')
-Channel_Author = os.environ.get('Channel_Author')
+Channel_Author = ast.literal_eval(os.environ.get('Channel_Author'))
 
 storage_client = storage.Client()
 
