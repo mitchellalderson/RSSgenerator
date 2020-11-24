@@ -4,12 +4,12 @@ from requests import get
 import tempfile
 from google.cloud import storage
 import os
-#from dotenv import load_dotenv
+from dotenv import load_dotenv
 import ast
-#import memory_profiler
-#os.environ[
-#   'GOOGLE_APPLICATION_CREDENTIALS'] = '/Users/mitchellalderson/Documents/WebDev/RSS/rsscreatortest-2e1edcb21dfc.json'
-#load_dotenv()
+from memory_profiler import profile
+os.environ[
+    'GOOGLE_APPLICATION_CREDENTIALS'] = '/Users/mitchellalderson/Documents/WebDev/RSS/rsscreatortest-2e1edcb21dfc.json'
+load_dotenv()
 Client_URL = os.environ.get('Client_URL')
 Channel_Title = os.environ.get('Channel_Title')
 Logo_URL = os.environ.get('Logo_URL')
@@ -41,6 +41,7 @@ def ingest(event, context):
     FeedFileGen(FileList)
 
 
+@profile
 def FeedFileGen(FileList):
 
     fg = FeedGenerator()
@@ -93,6 +94,6 @@ def FeedFileGen(FileList):
 
 #TODO: probably need some kind of memory cleanup?
 
-#test1 = {"bucket": "elfpodstore"}
+test1 = {"bucket": "elfpodstore"}
 
-#ingest(test1, "null")
+ingest(test1, "null")
