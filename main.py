@@ -4,15 +4,17 @@ from requests import get
 import tempfile
 from google.cloud import storage
 import os
+import memory_profiler
 os.environ[
     'GOOGLE_APPLICATION_CREDENTIALS'] = '/Users/mitchellalderson/Documents/WebDev/RSS/rsscreatortest-2e1edcb21dfc.json'
+
+storage_client = storage.Client()
 
 
 def ingest(event, context):
 
     file = event
     bucket_name = file['bucket']
-    storage_client = storage.Client()
     print("bucket name: " + bucket_name)
 
     blobs = storage_client.list_blobs(
@@ -26,7 +28,6 @@ def ingest(event, context):
         print(blob.name)
         FileList.append(blob.public_url)
     FileList.pop(0)
-    print(FileList)
     FeedFileGen(FileList)
 
 
@@ -41,7 +42,7 @@ def FeedFileGen(FileList):
         'email': 'Mitch@example.com'
     })
     fg.link(href="https://elf.church/", rel='alternate')
-    fg.logo('https://storage.googleapis.com/elfpodstore/Logo.png')
+    fg.logo('https://storage.googleapis.com/elfpodxml/Logo.png')
     fg.subtitle('Podcast Archive of Evening Light Fellowship Services')
     fg.link(href="https://elf.church/", rel='self')
     fg.language('en')
@@ -66,9 +67,19 @@ def FeedFileGen(FileList):
         fe.title(str(fileMeta.tags['title']).strip('\'\[\]'))
         fe.description(str(fileMeta.tags['artist']).strip('\'\[\]'))
         fe.enclosure(str(FileListItem), 0, 'audio/mpeg')
-
+        LocalFile.close()
     rssfeed = fg.rss_str(pretty=True)  # Get the RSS feed as string
-    fg.rss_file('rss.xml')  # Write the RSS feed to a file
+    print(rssfeed)
+    uploadBucket = storage_client.bucket('elfpodxml')
+    uploadBlob = uploadBucket.blob('rss.xml')
+
+    localUploadFile = tempfile.NamedTemporaryFile(suffix='.xml')
+    localUploadFile.write(bytes(rssfeed))
+    localUploadFile.seek(0)
+    print(localUploadFile)
+    # Write the RSS feed to a file
+
+    uploadBlob.upload_from_file(localUploadFile)
 
 
 test1 = {"bucket": "elfpodstore"}
