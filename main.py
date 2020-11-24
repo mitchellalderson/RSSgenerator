@@ -4,7 +4,7 @@ from requests import get
 import tempfile
 from google.cloud import storage
 #import os
-import memory_profiler
+#import memory_profiler
 #os.environ[
 #'GOOGLE_APPLICATION_CREDENTIALS'] = '/Users/mitchellalderson/Documents/WebDev/RSS/rsscreatortest-2e1edcb21dfc.json'
 
