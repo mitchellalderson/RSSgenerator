@@ -3,10 +3,10 @@ import audio_metadata
 from requests import get
 import tempfile
 from google.cloud import storage
-import os
+#import os
 import memory_profiler
-os.environ[
-    'GOOGLE_APPLICATION_CREDENTIALS'] = '/Users/mitchellalderson/Documents/WebDev/RSS/rsscreatortest-2e1edcb21dfc.json'
+#os.environ[
+#'GOOGLE_APPLICATION_CREDENTIALS'] = '/Users/mitchellalderson/Documents/WebDev/RSS/rsscreatortest-2e1edcb21dfc.json'
 
 storage_client = storage.Client()
 
@@ -82,6 +82,6 @@ def FeedFileGen(FileList):
     uploadBlob.upload_from_file(localUploadFile)
 
 
-test1 = {"bucket": "elfpodstore"}
+#test1 = {"bucket": "elfpodstore"}
 
-ingest(test1, "null")
+#ingest(test1, "null")
