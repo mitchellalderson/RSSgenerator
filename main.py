@@ -12,13 +12,15 @@ def ingest(event, context):
     storage_client = storage.Client()
     print("bucket name: " + bucket_name)
 
-    blobs = storage_client.list_blobs(bucket_name, prefix='Audio')
+    blobs = storage_client.list_blobs(bucket_name,
+                                      prefix='Audio',
+                                      delimiter='/')
     print("blobs:")
     FileList = []
 
     for blob in blobs:
         print(blob.name)
-        FileList.append(blob.name)
+        FileList.append(blob)
 
     print(FileList)
 
