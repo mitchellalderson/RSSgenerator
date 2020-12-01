@@ -4,10 +4,10 @@ from requests import get
 import tempfile
 from google.cloud import storage
 import os
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 import ast
 #from memory_profiler import profile
-load_dotenv()
+#load_dotenv()
 #os.environ[
 #   'GOOGLE_APPLICATION_CREDENTIALS'] = '/Users/mitchellalderson/Documents/WebDev/RSS/rsscreatortest-2e1edcb21dfc.json'
 
