@@ -5,12 +5,14 @@
     "version": "0.2.0",
     "configurations": [
 
+
         {
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
             "program": "${file}",
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
+            "env": {"GOOGLE_APPLICATION_CREDENTIALS":"/Users/mitchellalderson/Documents/WebDev/RSS/rsscreatortest-2e1edcb21dfc.json"}
         },
         {
             "name": "Mem Profile: Current File",
@@ -20,6 +22,14 @@
             "console": "integratedTerminal",
             "pythonArgs": ["-m memory_profiler"],
             "args": ["-m memory_profiler"]
+        }
+        {
+            "name": "Mem Profile: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            ""
         }
     ]
 }

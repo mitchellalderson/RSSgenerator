@@ -6,10 +6,11 @@ from google.cloud import storage
 import os
 from dotenv import load_dotenv
 import ast
-from memory_profiler import profile
-os.environ[
-    'GOOGLE_APPLICATION_CREDENTIALS'] = '/Users/mitchellalderson/Documents/WebDev/RSS/rsscreatortest-2e1edcb21dfc.json'
+#from memory_profiler import profile
 load_dotenv()
+#os.environ[
+#   'GOOGLE_APPLICATION_CREDENTIALS'] = '/Users/mitchellalderson/Documents/WebDev/RSS/rsscreatortest-2e1edcb21dfc.json'
+
 Client_URL = os.environ.get('Client_URL')
 Channel_Title = os.environ.get('Channel_Title')
 Logo_URL = os.environ.get('Logo_URL')
@@ -17,12 +18,12 @@ Channel_Subtitle = os.environ.get('Channel_Subtitle')
 Itunes_Category = os.environ.get('Itunes_Category')
 XML_Upload_Location = os.environ.get('XML_Upload_Location')
 Channel_Author = ast.literal_eval(os.environ.get('Channel_Author'))
+Itunes_Author = os.environ.get('Itunes_Author')
 
 storage_client = storage.Client()
 
 
 def ingest(event, context):
-
     file = event
     bucket_name = file['bucket']
     #print("bucket name: " + bucket_name)
@@ -41,7 +42,6 @@ def ingest(event, context):
     FeedFileGen(FileList)
 
 
-@profile
 def FeedFileGen(FileList):
 
     fg = FeedGenerator()
@@ -57,6 +57,7 @@ def FeedFileGen(FileList):
     fg.generator('Faraway Southwest LLC RSS Generator')
     fg.podcast.itunes_explicit('no')
     fg.podcast.itunes_category(Itunes_Category)
+    fg.podcast.itunes_author(Itunes_Author)
 
     #atomfeed = fg.atom_str(pretty=True)  # Get the ATOM feed as string
 
@@ -74,7 +75,9 @@ def FeedFileGen(FileList):
         fe.id(str(FileListItem))
         fe.title(str(fileMeta.tags['title']).strip('\'\[\]'))
         fe.description(str(fileMeta.tags['artist']).strip('\'\[\]'))
+        fe.updated()
         fe.enclosure(str(FileListItem), 0, 'audio/mpeg')
+        #fe.published('')
         LocalFile.close()
     rssfeed = fg.rss_str(pretty=True)  # Get the RSS feed as string
 
@@ -94,6 +97,6 @@ def FeedFileGen(FileList):
 
 #TODO: probably need some kind of memory cleanup?
 
-test1 = {"bucket": "elfpodstore"}
+#test1 = {"bucket": "elfpodstore"}
 
-ingest(test1, "null")
+#ingest(test1, "null")
