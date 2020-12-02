@@ -32,17 +32,27 @@ def ingest(event, context):
 
     blobs = storage_client.list_blobs(bucket_name)
     print("blobs:")
-    FileList = []
 
     for blob in blobs:
-        print(blob.name)
-        FileList.append(blob.public_url)
+
         doc_ref = firestore_client.collection(u'SongEntries').document(
-            str(blob.name))
-        doc_ref.set({
-            u'name': blob.name.strip('.mp3'),
-            u'PublicURL': blob.public_url,
-        })
+            blob.name)
+        doc = doc_ref.get()
+        if doc.exists:
+            print(blob.name + " song already logged")
+        else:
+            print(blob.name + " added to database")
+            doc_ref = firestore_client.collection(u'SongEntries').document(
+                str(blob.name))
+            doc_ref.set({
+                u'name': blob.name.strip('.mp3'),
+                u'PublicURL': blob.public_url,
+            })
+    files = firestore_client.collection(u'SongEntries').stream()
+    FileList = {}
+    for file in files:
+        FileList.update({file.id: file.to_dict()})
+    print(FileList)
     FeedFileGen(FileList)
 
 
@@ -67,7 +77,7 @@ def FeedFileGen(FileList):
 
     #fg.atom_file('atom.xml')  # Write the ATOM feed to a file
 
-    for FileListItem in FileList:
+    for FileListItem in FileList['PublicURL']:
         getLocalFile = get(FileListItem)
         LocalFile = tempfile.NamedTemporaryFile(suffix='.mp3', delete=False)
         LocalFile.write(getLocalFile.content)
