@@ -1,15 +1,14 @@
+"""Generates RSS feed from directory of files."""
+
 from feedgen.feed import FeedGenerator
 import audio_metadata
 from requests import get
 import tempfile
 from google.cloud import storage
 import os
-#from dotenv import load_dotenv
 import ast
-#from memory_profiler import profile
-#load_dotenv()
-#os.environ[
-#   'GOOGLE_APPLICATION_CREDENTIALS'] = '/Users/mitchellalderson/Documents/WebDev/RSS/rsscreatortest-2e1edcb21dfc.json'
+
+storage_client = storage.Client()
 
 Client_URL = os.environ.get('Client_URL')
 Channel_Title = os.environ.get('Channel_Title')
@@ -19,11 +18,12 @@ Itunes_Category = os.environ.get('Itunes_Category')
 XML_Upload_Location = os.environ.get('XML_Upload_Location')
 Channel_Author = ast.literal_eval(os.environ.get('Channel_Author'))
 Itunes_Author = os.environ.get('Itunes_Author')
-
-storage_client = storage.Client()
+GOOGLE_APPLICATION_CREDENTIALS = os.environ.get(
+    'GOOGLE_APPLICATION_CREDENTIALS')
 
 
 def ingest(event, context):
+    """Read bucket, get file listing."""
     file = event
     bucket_name = file['bucket']
     #print("bucket name: " + bucket_name)
@@ -43,7 +43,7 @@ def ingest(event, context):
 
 
 def FeedFileGen(FileList):
-
+    """Generate XML from file FileList."""
     fg = FeedGenerator()
     fg.load_extension('podcast')
     fg.id(Client_URL)
@@ -65,7 +65,7 @@ def FeedFileGen(FileList):
 
     for FileListItem in FileList:
         getLocalFile = get(FileListItem)
-        LocalFile = tempfile.NamedTemporaryFile(suffix='.mp3')
+        LocalFile = tempfile.NamedTemporaryFile(suffix='.mp3', delete=False)
         LocalFile.write(getLocalFile.content)
         LocalFile.seek(0)
 
@@ -79,6 +79,7 @@ def FeedFileGen(FileList):
         fe.enclosure(str(FileListItem), 0, 'audio/mpeg')
         #fe.published('')
         LocalFile.close()
+        os.unlink(LocalFile.name)
     rssfeed = fg.rss_str(pretty=True)  # Get the RSS feed as string
 
     uploadBucket = storage_client.bucket(XML_Upload_Location)
@@ -95,8 +96,4 @@ def FeedFileGen(FileList):
     localUploadFile.close()
 
 
-#TODO: probably need some kind of memory cleanup?
-
-#test1 = {"bucket": "elfpodstore"}
-
-#ingest(test1, "null")
+#TODO: probably need some aditional of memory cleanup?
