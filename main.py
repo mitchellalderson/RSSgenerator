@@ -20,6 +20,7 @@ Itunes_Category = os.environ.get('Itunes_Category')
 XML_Upload_Location = os.environ.get('XML_Upload_Location')
 Channel_Author = ast.literal_eval(os.environ.get('Channel_Author'))
 Itunes_Author = os.environ.get('Itunes_Author')
+XML_Name = os.environ.get('XML_Name')
 GOOGLE_APPLICATION_CREDENTIALS = os.environ.get(
     'GOOGLE_APPLICATION_CREDENTIALS')
 
@@ -30,10 +31,7 @@ def ingest(event, context):
     bucket_name = file['bucket']
     #print("bucket name: " + bucket_name)
 
-    blobs = storage_client.list_blobs(
-        bucket_name,
-        prefix='Audio/mp3/',
-    )
+    blobs = storage_client.list_blobs(bucket_name)
     print("blobs:")
     FileList = []
 
@@ -46,7 +44,6 @@ def ingest(event, context):
             u'name': blob.name,
             u'PublicURL': blob.public_url,
         })
-    FileList.pop(0)
     FeedFileGen(FileList)
 
 
@@ -83,14 +80,16 @@ def FeedFileGen(FileList):
         fe.id(str(FileListItem))
         fe.title(str(fileMeta.tags['title']).strip('\'\[\]'))
         fe.description(str(fileMeta.tags['artist']).strip('\'\[\]'))
-        fe.enclosure(str(FileListItem), fileMeta['filesize'], 'audio/mpeg')
+        fe.enclosure(str(FileListItem), str(fileMeta['filesize']),
+                     'audio/mpeg')
         #fe.published('')
         LocalFile.close()
         os.unlink(LocalFile.name)
+
     rssfeed = fg.rss_str(pretty=True)  # Get the RSS feed as string
 
     uploadBucket = storage_client.bucket(XML_Upload_Location)
-    uploadBlob = uploadBucket.blob('rss.xml')
+    uploadBlob = uploadBucket.blob(XML_Name)
 
     localUploadFile = tempfile.NamedTemporaryFile(suffix='.xml')
     localUploadFile.write(bytes(rssfeed))
