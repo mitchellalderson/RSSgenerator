@@ -4,8 +4,7 @@ from feedgen.feed import FeedGenerator
 import audio_metadata
 from requests import get
 import tempfile
-from google.cloud import storage
-from google.cloud import firestore
+from google.cloud import storage, firestore
 import os
 import ast
 

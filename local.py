@@ -2,8 +2,6 @@
 
 from main import ingest
 from dotenv import load_dotenv
-import os
-import ast
 
 load_dotenv()
 
