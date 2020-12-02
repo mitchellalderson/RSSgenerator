@@ -5,10 +5,12 @@ import audio_metadata
 from requests import get
 import tempfile
 from google.cloud import storage
+from google.cloud import firestore
 import os
 import ast
 
 storage_client = storage.Client()
+firestore_client = firestore.Client()
 
 Client_URL = os.environ.get('Client_URL')
 Channel_Title = os.environ.get('Channel_Title')
@@ -38,6 +40,12 @@ def ingest(event, context):
     for blob in blobs:
         print(blob.name)
         FileList.append(blob.public_url)
+        doc_ref = firestore_client.collection(u'SongEntries').document(
+            str(blob.generation))
+        doc_ref.set({
+            u'name': blob.name,
+            u'PublicURL': blob.public_url,
+        })
     FileList.pop(0)
     FeedFileGen(FileList)
 
@@ -75,8 +83,7 @@ def FeedFileGen(FileList):
         fe.id(str(FileListItem))
         fe.title(str(fileMeta.tags['title']).strip('\'\[\]'))
         fe.description(str(fileMeta.tags['artist']).strip('\'\[\]'))
-        fe.updated()
-        fe.enclosure(str(FileListItem), 0, 'audio/mpeg')
+        fe.enclosure(str(FileListItem), fileMeta['filesize'], 'audio/mpeg')
         #fe.published('')
         LocalFile.close()
         os.unlink(LocalFile.name)
@@ -94,6 +101,11 @@ def FeedFileGen(FileList):
     uploadBlob.cache_control = metadata
     uploadBlob.upload_from_file(localUploadFile)
     localUploadFile.close()
+
+
+#TODO
+def DBUpdate(Payload):
+    """Update database with any new entry."""
 
 
 #TODO: probably need some aditional of memory cleanup?
