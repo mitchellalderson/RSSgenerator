@@ -1,15 +1,16 @@
+"""Generates RSS feed from directory of files."""
+
 from feedgen.feed import FeedGenerator
 import audio_metadata
 from requests import get
 import tempfile
 from google.cloud import storage
+from google.cloud import firestore
 import os
-#from dotenv import load_dotenv
 import ast
-#from memory_profiler import profile
-#load_dotenv()
-#os.environ[
-#   'GOOGLE_APPLICATION_CREDENTIALS'] = '/Users/mitchellalderson/Documents/WebDev/RSS/rsscreatortest-2e1edcb21dfc.json'
+
+storage_client = storage.Client()
+firestore_client = firestore.Client()
 
 Client_URL = os.environ.get('Client_URL')
 Channel_Title = os.environ.get('Channel_Title')
@@ -19,31 +20,35 @@ Itunes_Category = os.environ.get('Itunes_Category')
 XML_Upload_Location = os.environ.get('XML_Upload_Location')
 Channel_Author = ast.literal_eval(os.environ.get('Channel_Author'))
 Itunes_Author = os.environ.get('Itunes_Author')
-
-storage_client = storage.Client()
+XML_Name = os.environ.get('XML_Name')
+GOOGLE_APPLICATION_CREDENTIALS = os.environ.get(
+    'GOOGLE_APPLICATION_CREDENTIALS')
 
 
 def ingest(event, context):
+    """Read bucket, get file listing."""
     file = event
     bucket_name = file['bucket']
     #print("bucket name: " + bucket_name)
 
-    blobs = storage_client.list_blobs(
-        bucket_name,
-        prefix='Audio/mp3/',
-    )
+    blobs = storage_client.list_blobs(bucket_name)
     print("blobs:")
     FileList = []
 
     for blob in blobs:
         print(blob.name)
         FileList.append(blob.public_url)
-    FileList.pop(0)
+        doc_ref = firestore_client.collection(u'SongEntries').document(
+            str(blob.generation))
+        doc_ref.set({
+            u'name': blob.name,
+            u'PublicURL': blob.public_url,
+        })
     FeedFileGen(FileList)
 
 
 def FeedFileGen(FileList):
-
+    """Generate XML from file FileList."""
     fg = FeedGenerator()
     fg.load_extension('podcast')
     fg.id(Client_URL)
@@ -65,7 +70,7 @@ def FeedFileGen(FileList):
 
     for FileListItem in FileList:
         getLocalFile = get(FileListItem)
-        LocalFile = tempfile.NamedTemporaryFile(suffix='.mp3')
+        LocalFile = tempfile.NamedTemporaryFile(suffix='.mp3', delete=False)
         LocalFile.write(getLocalFile.content)
         LocalFile.seek(0)
 
@@ -75,14 +80,16 @@ def FeedFileGen(FileList):
         fe.id(str(FileListItem))
         fe.title(str(fileMeta.tags['title']).strip('\'\[\]'))
         fe.description(str(fileMeta.tags['artist']).strip('\'\[\]'))
-        fe.updated()
-        fe.enclosure(str(FileListItem), 0, 'audio/mpeg')
+        fe.enclosure(str(FileListItem), str(fileMeta['filesize']),
+                     'audio/mpeg')
         #fe.published('')
         LocalFile.close()
+        os.unlink(LocalFile.name)
+
     rssfeed = fg.rss_str(pretty=True)  # Get the RSS feed as string
 
     uploadBucket = storage_client.bucket(XML_Upload_Location)
-    uploadBlob = uploadBucket.blob('rss.xml')
+    uploadBlob = uploadBucket.blob(XML_Name)
 
     localUploadFile = tempfile.NamedTemporaryFile(suffix='.xml')
     localUploadFile.write(bytes(rssfeed))
@@ -95,8 +102,9 @@ def FeedFileGen(FileList):
     localUploadFile.close()
 
 
-#TODO: probably need some kind of memory cleanup?
+#TODO
+def DBUpdate(Payload):
+    """Update database with any new entry."""
 
-#test1 = {"bucket": "elfpodstore"}
 
-#ingest(test1, "null")
+#TODO: probably need some aditional of memory cleanup?

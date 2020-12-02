@@ -6,13 +6,20 @@
     "configurations": [
 
 
+
         {
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
             "program": "${file}",
-            "console": "integratedTerminal",
-            "env": {"GOOGLE_APPLICATION_CREDENTIALS":"/Users/mitchellalderson/Documents/WebDev/RSS/rsscreatortest-2e1edcb21dfc.json"}
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Python: Local",
+            "type": "python",
+            "request": "launch",
+            "program": "local.py",
+            "console": "integratedTerminal"
         },
         {
             "name": "Mem Profile: Current File",
@@ -23,13 +30,6 @@
             "pythonArgs": ["-m memory_profiler"],
             "args": ["-m memory_profiler"]
         }
-        {
-            "name": "Mem Profile: Current File",
-            "type": "python",
-            "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal",
-            ""
-        }
+     
     ]
 }
