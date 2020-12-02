@@ -38,9 +38,9 @@ def ingest(event, context):
         print(blob.name)
         FileList.append(blob.public_url)
         doc_ref = firestore_client.collection(u'SongEntries').document(
-            str(blob.generation))
+            str(blob.name))
         doc_ref.set({
-            u'name': blob.name,
+            u'name': blob.name.strip('.mp3'),
             u'PublicURL': blob.public_url,
         })
     FeedFileGen(FileList)
