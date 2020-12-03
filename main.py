@@ -25,7 +25,7 @@ GOOGLE_APPLICATION_CREDENTIALS = os.environ.get(
 
 
 def ingest(event, context):
-    """Read bucket, get file listing."""
+    """Read bucket, get file listing, write file listing to database."""
     bucket_name = event['bucket']
     print("bucket name: " + bucket_name)
 

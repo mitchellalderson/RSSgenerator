@@ -7,6 +7,7 @@
 
 
 
+
         {
             "name": "Python: Current File",
             "type": "python",
@@ -25,7 +26,7 @@
             "name": "Mem Profile: Current File",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
+            "program": "local.py",
             "console": "integratedTerminal",
             "pythonArgs": ["-m memory_profiler"],
             "args": ["-m memory_profiler"]
