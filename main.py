@@ -9,7 +9,6 @@ import os
 import ast
 
 storage_client = storage.Client()
-firestore_client = firestore.Client()
 
 Client_Id = os.environ.get('Client_ID')
 Client_URL = os.environ.get('Client_URL')
@@ -27,18 +26,18 @@ GOOGLE_APPLICATION_CREDENTIALS = os.environ.get(
 
 def ingest(event, context):
     """Read bucket, get file listing."""
-    file = event
-    bucket_name = file['bucket']
+    bucket_name = event['bucket']
     print("bucket name: " + bucket_name)
 
     blobs = storage_client.list_blobs(bucket_name)
     print("blobs:")
 
-    client_ref = firestore_client.collection(Client_Id).document(u'filestore')
+    firestore_client = firestore.Client()
+    client_ref = firestore_client.collection(Client_Id).document(u'fileStore')
 
     for blob in blobs:
 
-        doc_ref = client_ref.collection(u'SongEntries').document(blob.name)
+        doc_ref = client_ref.collection(u'songEntries').document(blob.name)
         doc = doc_ref.get()
         if doc.exists:
             print(blob.name + " song already logged")
@@ -53,7 +52,7 @@ def ingest(event, context):
 
             fileMeta = audio_metadata.load(LocalFile.name)
 
-            doc_write = client_ref.collection(u'SongEntries').document(
+            doc_write = client_ref.collection(u'songEntries').document(
                 blob.name)
             doc_write.set({
                 u'name':
@@ -68,7 +67,7 @@ def ingest(event, context):
             LocalFile.close()
             os.unlink(LocalFile.name)
 
-    files = client_ref.collection(u'SongEntries').stream()
+    files = client_ref.collection(u'songEntries').stream()
     FileList = {}
     for file in files:
         FileList.update({file.id: file.to_dict()})
