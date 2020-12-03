@@ -29,7 +29,7 @@ def ingest(event, context):
     """Read bucket, get file listing."""
     file = event
     bucket_name = file['bucket']
-    #print("bucket name: " + bucket_name)
+    print("bucket name: " + bucket_name)
 
     blobs = storage_client.list_blobs(bucket_name)
     print("blobs:")
@@ -53,9 +53,9 @@ def ingest(event, context):
 
             fileMeta = audio_metadata.load(LocalFile.name)
 
-            doc_ref = client_ref.collection(u'SongEntries').document(
-                str(blob.name))
-            doc_ref.set({
+            doc_write = client_ref.collection(u'SongEntries').document(
+                blob.name)
+            doc_write.set({
                 u'name':
                 blob.name,
                 u'PublicURL':
