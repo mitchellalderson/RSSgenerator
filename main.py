@@ -42,17 +42,35 @@ def ingest(event, context):
             print(blob.name + " song already logged")
         else:
             print(blob.name + " added to database")
+
+            getLocalFile = get(blob.public_url)
+            LocalFile = tempfile.NamedTemporaryFile(suffix='.mp3',
+                                                    delete=False)
+            LocalFile.write(getLocalFile.content)
+            LocalFile.seek(0)
+
+            fileMeta = audio_metadata.load(LocalFile.name)
+
+            LocalFile.close()
+            os.unlink(LocalFile.name)
+
             doc_ref = firestore_client.collection(u'SongEntries').document(
                 str(blob.name))
             doc_ref.set({
-                u'name': blob.name.strip('.mp3'),
-                u'PublicURL': blob.public_url,
+                u'name':
+                blob.name,
+                u'PublicURL':
+                blob.public_url,
+                u'title': (str(fileMeta.tags['title']).strip('\'\[\]')),
+                u'artist': (str(fileMeta.tags['artist']).strip('\'\[\]')),
+                u'filesize':
+                str(fileMeta['filesize']),
             })
+
     files = firestore_client.collection(u'SongEntries').stream()
     FileList = {}
     for file in files:
         FileList.update({file.id: file.to_dict()})
-    print(FileList)
     FeedFileGen(FileList)
 
 
@@ -77,8 +95,8 @@ def FeedFileGen(FileList):
 
     #fg.atom_file('atom.xml')  # Write the ATOM feed to a file
 
-    for FileListItem in FileList['PublicURL']:
-        getLocalFile = get(FileListItem)
+    for FileListItem in FileList:
+        getLocalFile = get(FileListItem['PublicURL'])
         LocalFile = tempfile.NamedTemporaryFile(suffix='.mp3', delete=False)
         LocalFile.write(getLocalFile.content)
         LocalFile.seek(0)
