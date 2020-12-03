@@ -34,9 +34,10 @@ def ingest(event, context):
     blobs = storage_client.list_blobs(bucket_name)
     print("blobs:")
 
+    client_ref = firestore_client.collection(Client_Id).document(u'filestore')
+
     for blob in blobs:
-        client_ref = firestore_client.collection(Client_Id).document(
-            u'filestore')
+
         doc_ref = client_ref.collection(u'SongEntries').document(blob.name)
         doc = doc_ref.get()
         if doc.exists:
@@ -52,8 +53,6 @@ def ingest(event, context):
 
             fileMeta = audio_metadata.load(LocalFile.name)
 
-            client_ref = firestore_client.collection(Client_Id).document(
-                u'filestore')
             doc_ref = client_ref.collection(u'SongEntries').document(
                 str(blob.name))
             doc_ref.set({
