@@ -51,9 +51,6 @@ def ingest(event, context):
 
             fileMeta = audio_metadata.load(LocalFile.name)
 
-            LocalFile.close()
-            os.unlink(LocalFile.name)
-
             doc_ref = firestore_client.collection(u'SongEntries').document(
                 str(blob.name))
             doc_ref.set({
@@ -64,8 +61,10 @@ def ingest(event, context):
                 u'title': (str(fileMeta.tags['title']).strip('\'\[\]')),
                 u'artist': (str(fileMeta.tags['artist']).strip('\'\[\]')),
                 u'filesize':
-                str(fileMeta['filesize']),
+                int(fileMeta['filesize']),
             })
+            LocalFile.close()
+            os.unlink(LocalFile.name)
 
     files = firestore_client.collection(u'SongEntries').stream()
     FileList = {}
@@ -96,22 +95,13 @@ def FeedFileGen(FileList):
     #fg.atom_file('atom.xml')  # Write the ATOM feed to a file
 
     for FileListItem in FileList:
-        getLocalFile = get(FileListItem['PublicURL'])
-        LocalFile = tempfile.NamedTemporaryFile(suffix='.mp3', delete=False)
-        LocalFile.write(getLocalFile.content)
-        LocalFile.seek(0)
-
-        fileMeta = audio_metadata.load(LocalFile.name)
 
         fe = fg.add_entry()
-        fe.id(str(FileListItem))
-        fe.title(str(fileMeta.tags['title']).strip('\'\[\]'))
-        fe.description(str(fileMeta.tags['artist']).strip('\'\[\]'))
-        fe.enclosure(str(FileListItem), str(fileMeta['filesize']),
-                     'audio/mpeg')
-        #fe.published('')
-        LocalFile.close()
-        os.unlink(LocalFile.name)
+        fe.id(FileList[FileListItem]['PublicURL'])
+        fe.title(FileList[FileListItem]['title'])
+        fe.description(FileList[FileListItem]['artist'])
+        fe.enclosure(FileList[FileListItem]['PublicURL'],
+                     str(FileList[FileListItem]['filesize']), 'audio/mpeg')
 
     rssfeed = fg.rss_str(pretty=True)  # Get the RSS feed as string
 
@@ -127,11 +117,6 @@ def FeedFileGen(FileList):
     uploadBlob.cache_control = metadata
     uploadBlob.upload_from_file(localUploadFile)
     localUploadFile.close()
-
-
-#TODO
-def DBUpdate(Payload):
-    """Update database with any new entry."""
 
 
 #TODO: probably need some aditional of memory cleanup?
