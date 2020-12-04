@@ -8,6 +8,8 @@
 
 
 
+
+
         {
             "name": "Python: Current File",
             "type": "python",
@@ -23,13 +25,12 @@
             "console": "integratedTerminal"
         },
         {
-            "name": "Mem Profile: Current File",
+            "name": "Mem Profile: Local Dev",
             "type": "python",
             "request": "launch",
             "program": "local.py",
             "console": "integratedTerminal",
-            "pythonArgs": ["-m memory_profiler"],
-            "args": ["-m memory_profiler"]
+            "pythonArgs": ["-m memory_profiler"]
         }
      
     ]

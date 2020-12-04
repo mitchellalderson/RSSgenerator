@@ -33,10 +33,11 @@ def ingest(event, context):
     print("blobs:")
 
     firestore_client = firestore.Client()
+    client_doc = firestore_client.collection(Client_Id).document('fileStore')
 
     for blob in blobs:
 
-        doc_ref = firestore_client.collection(Client_Id).document(blob.name)
+        doc_ref = client_doc.collection('songSpecial').document(blob.name)
         doc = doc_ref.get()
         if doc.exists:
             print(blob.name + " song already logged")
@@ -51,7 +52,7 @@ def ingest(event, context):
 
             fileMeta = audio_metadata.load(LocalFile.name)
 
-            doc_write = firestore_client.collection(Client_Id).document(
+            doc_write = client_doc.collection('songSpecial').document(
                 blob.name)
             doc_write.set({
                 u'name':
@@ -66,7 +67,7 @@ def ingest(event, context):
             LocalFile.close()
             os.unlink(LocalFile.name)
 
-    files = firestore_client.collection(Client_Id).stream()
+    files = client_doc.collection('songSpecial').stream()
     FileList = {}
     for file in files:
         FileList.update({file.id: file.to_dict()})
