@@ -7,6 +7,7 @@ import tempfile
 from google.cloud import storage, firestore
 import os
 import ast
+import datetime
 
 storage_client = storage.Client()
 
@@ -63,6 +64,7 @@ def ingest(event, context):
                 u'artist': (str(fileMeta.tags['artist']).strip('\'\[\]')),
                 u'filesize':
                 int(fileMeta['filesize']),
+                u'UploadDate': (datetime.datetime.today())
             })
             LocalFile.close()
             os.unlink(LocalFile.name)
@@ -101,6 +103,7 @@ def FeedFileGen(FileList):
         fe.id(FileList[FileListItem]['PublicURL'])
         fe.title(FileList[FileListItem]['title'])
         fe.description(FileList[FileListItem]['artist'])
+        fe.published(FileList[FileListItem]['UploadDate'])
         fe.enclosure(FileList[FileListItem]['PublicURL'],
                      str(FileList[FileListItem]['filesize']), 'audio/mpeg')
 
