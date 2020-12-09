@@ -3,6 +3,6 @@
     "python.linting.pylamaEnabled": false,
     "python.linting.enabled": true,
     "python.linting.pydocstyleEnabled": true,
-    "python.pythonPath": "/usr/local/bin/python3",
+    "python.pythonPath": "C:\\Program Files\\Python39\\python.exe",
     "python.formatting.provider": "yapf"
 }
