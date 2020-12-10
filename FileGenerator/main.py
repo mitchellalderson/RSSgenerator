@@ -60,8 +60,8 @@ def ingest(event, context):
                 blob.name,
                 u'PublicURL':
                 blob.public_url,
-                u'title': (str(fileMeta.tags['title']).strip('\'\[\]')),
-                u'artist': (str(fileMeta.tags['artist']).strip('\'\[\]')),
+                u'title': (str(fileMeta.tags['title']).strip('\'\[\]\"')),
+                u'artist': (str(fileMeta.tags['artist']).strip('\'\[\]\"')),
                 u'filesize':
                 int(fileMeta['filesize']),
                 u'UploadDate': (datetime.datetime.today())
