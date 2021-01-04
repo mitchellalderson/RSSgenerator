@@ -21,7 +21,7 @@
             "name": "Python: Local",
             "type": "python",
             "request": "launch",
-            "program": "local.py",
+            "program": "FileGenerator/local.py",
             "console": "integratedTerminal"
         },
         {

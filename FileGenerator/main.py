@@ -9,8 +9,6 @@ import os
 import ast
 import datetime
 
-storage_client = storage.Client()
-
 Client_Id = os.environ.get('Client_Id')
 Client_URL = os.environ.get('Client_URL')
 Channel_Title = os.environ.get('Channel_Title')
@@ -23,6 +21,8 @@ Itunes_Author = os.environ.get('Itunes_Author')
 XML_Name = os.environ.get('XML_Name')
 GOOGLE_APPLICATION_CREDENTIALS = os.environ.get(
     'GOOGLE_APPLICATION_CREDENTIALS')
+
+storage_client = storage.Client()
 
 
 def ingest(event, context):
@@ -50,22 +50,22 @@ def ingest(event, context):
                                                     delete=False)
             LocalFile.write(getLocalFile.content)
             LocalFile.seek(0)
-
             fileMeta = audio_metadata.load(LocalFile.name)
 
             doc_write = client_doc.collection('songSpecial').document(
                 blob.name)
-            doc_write.set({
-                u'name':
-                blob.name,
-                u'PublicURL':
-                blob.public_url,
-                u'title': (str(fileMeta.tags['title']).strip('\'\[\]')),
-                u'artist': (str(fileMeta.tags['artist']).strip('\'\[\]')),
-                u'filesize':
-                int(fileMeta['filesize']),
-                u'UploadDate': (datetime.datetime.today())
-            })
+            if 'title' in fileMeta.tags:
+                doc_write.set({
+                    u'name':
+                    blob.name,
+                    u'PublicURL':
+                    blob.public_url,
+                    u'title': (str(fileMeta.tags['title']).strip('\'\[\]')),
+                    u'artist': (str(fileMeta.tags['artist']).strip('\'\[\]')),
+                    u'filesize':
+                    int(fileMeta['filesize']),
+                    u'UploadDate': (datetime.datetime.today())
+                })
             LocalFile.close()
             os.unlink(LocalFile.name)
 
