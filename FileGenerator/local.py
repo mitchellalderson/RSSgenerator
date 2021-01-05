@@ -5,6 +5,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-test1 = {"bucket": "elfpodstore"}
+test1 = {"bucket": "rsscreatortest.appspot.com"}
 
 ingest(test1, "null")
