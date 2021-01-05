@@ -11,6 +11,7 @@ import datetime
 
 Client_Id = ''
 Client_URL = ''
+Channel_Title = ''
 Logo_URL = ''
 Channel_Subtitle = ''
 Itunes_Category = ''
@@ -32,16 +33,15 @@ def ingest(event, context):
 
     client_config = firestore_client.collection(Client_Id).document(
         'config').get()
-    Client_Id = 'mitchpodcast'
-    Client_URL = 'https://farawaysouthwest.com'
-    Channel_Title = 'Mitch Learns Stuff'
-    Logo_URL = 'https://storage.googleapis.com/elfpodxml/mitchpodcastlogo.png'
-    Channel_Subtitle = 'Curiosity killed the cat, not us.'
-    Itunes_Category = 'Technology'
-    XML_Upload_Location = 'elfpodxml'
-    Channel_Author = 'Mitch Alderson'
-    Itunes_Author = 'Mitch Alderson'
-    XML_Name = 'mitchpodcastrss.xml'
+    Client_URL = client_config._data['Client_URL']
+    Channel_Title = client_config._data['Channel_Title']
+    Logo_URL = client_config._data['Logo_URL']
+    Channel_Subtitle = client_config._data['Channel_Subtitle']
+    Itunes_Category = client_config._data['Itunes_Category']
+    XML_Upload_Location = client_config._data['XML_Upload_Location']
+    Channel_Author = client_config._data['Channel_Author']
+    Itunes_Author = client_config._data['Itunes_Author']
+    XML_Name = client_config._data['XML_Name']
     """Get file list."""
     client_doc = firestore_client.collection(Client_Id).document('fileStore')
 
@@ -49,10 +49,6 @@ def ingest(event, context):
     FileList = {}
     for file in files:
         FileList.update({file.id: file.to_dict()})
-    FeedFileGen(FileList)
-
-
-def FeedFileGen(FileList):
     """Generate XML from file FileList."""
     fg = FeedGenerator()
     fg.load_extension('podcast')
