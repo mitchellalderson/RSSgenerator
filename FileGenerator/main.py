@@ -9,24 +9,13 @@ import os
 import ast
 import datetime
 
-Client_Id = ''
-Client_URL = ''
-Channel_Title = ''
-Logo_URL = ''
-Channel_Subtitle = ''
-Itunes_Category = ''
-XML_Upload_Location = ''
-Channel_Author = ''
-Itunes_Author = ''
-XML_Name = ''
 GOOGLE_APPLICATION_CREDENTIALS = os.environ.get(
     'GOOGLE_APPLICATION_CREDENTIALS')
 
 
 def ingest(event, context):
     """Get Client Config."""
-    path = context['resource']
-    path_parts = path.split('/documents/')[1].split('/')
+    path_parts = context.resource.split('/documents/')[1].split('/')
     Client_Id = path_parts[0]
 
     firestore_client = firestore.Client()
