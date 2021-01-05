@@ -15,7 +15,7 @@ GOOGLE_APPLICATION_CREDENTIALS = os.environ.get(
 
 def ingest(event, context):
     """Get Client Config."""
-    path_parts = context['resource'].split('/documents/')[1].split('/')
+    path_parts = context.resource.split('/documents/')[1].split('/')
     Client_Id = path_parts[0]
     file_type = path_parts[2]
 
@@ -35,6 +35,7 @@ def ingest(event, context):
     """Get file list."""
     client_doc = firestore_client.collection(Client_Id).document('fileStore')
 
+    #get files from database, generate RSS file
     files = client_doc.collection(file_type).stream()
     FileList = {}
     for file in files:
@@ -50,7 +51,7 @@ def ingest(event, context):
     fg.subtitle(Channel_Subtitle)
     fg.link(href=Client_URL, rel='self')
     fg.language('en')
-    fg.generator('Faraway Southwest LLC RSS Generator')
+    fg.generator('Faraway Southwest RSS Generator')
     fg.podcast.itunes_explicit('no')
     fg.podcast.itunes_category(Itunes_Category)
     fg.podcast.itunes_author(Itunes_Author)
@@ -85,6 +86,3 @@ def ingest(event, context):
     uploadBlob.cache_control = metadata
     uploadBlob.upload_from_file(localUploadFile)
     localUploadFile.close()
-
-
-#TODO: probably need some aditional of memory cleanup?
