@@ -9,65 +9,41 @@ import os
 import ast
 import datetime
 
-Client_Id = os.environ.get('Client_Id')
-Client_URL = os.environ.get('Client_URL')
-Channel_Title = os.environ.get('Channel_Title')
-Logo_URL = os.environ.get('Logo_URL')
-Channel_Subtitle = os.environ.get('Channel_Subtitle')
-Itunes_Category = os.environ.get('Itunes_Category')
-XML_Upload_Location = os.environ.get('XML_Upload_Location')
-Channel_Author = ast.literal_eval(os.environ.get('Channel_Author'))
-Itunes_Author = os.environ.get('Itunes_Author')
-XML_Name = os.environ.get('XML_Name')
+Client_Id = ''
+Client_URL = ''
+Logo_URL = ''
+Channel_Subtitle = ''
+Itunes_Category = ''
+XML_Upload_Location = ''
+Channel_Author = ''
+Itunes_Author = ''
+XML_Name = ''
 GOOGLE_APPLICATION_CREDENTIALS = os.environ.get(
     'GOOGLE_APPLICATION_CREDENTIALS')
 
-storage_client = storage.Client()
-
 
 def ingest(event, context):
-    """Read bucket, get file listing, write file listing to database."""
-    bucket_name = event['bucket']
-    print("bucket name: " + bucket_name)
-
-    blobs = storage_client.list_blobs(bucket_name)
-    print("blobs:")
+    """Get Client Config."""
+    path = context['resource']
+    path_parts = path.split('/documents/')[1].split('/')
+    Client_Id = path_parts[0]
 
     firestore_client = firestore.Client()
+
+    client_config = firestore_client.collection(Client_Id).document(
+        'config').get()
+    Client_Id = 'mitchpodcast'
+    Client_URL = 'https://farawaysouthwest.com'
+    Channel_Title = 'Mitch Learns Stuff'
+    Logo_URL = 'https://storage.googleapis.com/elfpodxml/mitchpodcastlogo.png'
+    Channel_Subtitle = 'Curiosity killed the cat, not us.'
+    Itunes_Category = 'Technology'
+    XML_Upload_Location = 'elfpodxml'
+    Channel_Author = 'Mitch Alderson'
+    Itunes_Author = 'Mitch Alderson'
+    XML_Name = 'mitchpodcastrss.xml'
+    """Get file list."""
     client_doc = firestore_client.collection(Client_Id).document('fileStore')
-
-    for blob in blobs:
-
-        doc_ref = client_doc.collection('songSpecial').document(blob.name)
-        doc = doc_ref.get()
-        if doc.exists:
-            print(blob.name + " song already logged")
-        else:
-            print(blob.name + " added to database")
-
-            getLocalFile = get(blob.public_url)
-            LocalFile = tempfile.NamedTemporaryFile(suffix='.mp3',
-                                                    delete=False)
-            LocalFile.write(getLocalFile.content)
-            LocalFile.seek(0)
-            fileMeta = audio_metadata.load(LocalFile.name)
-
-            doc_write = client_doc.collection('songSpecial').document(
-                blob.name)
-            if 'title' in fileMeta.tags:
-                doc_write.set({
-                    u'name':
-                    blob.name,
-                    u'PublicURL':
-                    blob.public_url,
-                    u'title': (str(fileMeta.tags['title']).strip('\'\[\]')),
-                    u'artist': (str(fileMeta.tags['artist']).strip('\'\[\]')),
-                    u'filesize':
-                    int(fileMeta['filesize']),
-                    u'UploadDate': (datetime.datetime.today())
-                })
-            LocalFile.close()
-            os.unlink(LocalFile.name)
 
     files = client_doc.collection('songSpecial').stream()
     FileList = {}
@@ -108,6 +84,8 @@ def FeedFileGen(FileList):
                      str(FileList[FileListItem]['filesize']), 'audio/mpeg')
 
     rssfeed = fg.rss_str(pretty=True)  # Get the RSS feed as string
+
+    storage_client = storage.Client()
 
     uploadBucket = storage_client.bucket(XML_Upload_Location)
     uploadBlob = uploadBucket.blob(XML_Name)
