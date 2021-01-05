@@ -1,16 +1,16 @@
 from google.cloud import storage, firestore
 import os
 
-Client_Id = 'EveningLight'
-Client_URL = 'https://elf.church/'
-Channel_Title = 'Evening Light Fellowship Song Specials'
-Logo_URL = 'https://storage.googleapis.com/elfpodxml/Logo.png'
-Channel_Subtitle = 'Podcast Archive of Evening Light Fellowship Song Specials'
-Itunes_Category = 'Religion & Spirituality'
+Client_Id = 'mitchpodcast'
+Client_URL = 'https://farawaysouthwest.com'
+Channel_Title = 'Mitch Learns Stuff'
+Logo_URL = 'https://storage.googleapis.com/elfpodxml/mitchpodcastlogo.png'
+Channel_Subtitle = 'Curiosity killed the cat, not us.'
+Itunes_Category = 'Technology'
 XML_Upload_Location = 'elfpodxml'
-Channel_Author = 'Evening Light Fellowship'
-Itunes_Author = 'Evening Light Fellowship'
-XML_Name = 'localdev.xml'
+Channel_Author = 'Mitch Alderson'
+Itunes_Author = 'Mitch Alderson'
+XML_Name = 'mitchpodcastrss.xml'
 GOOGLE_APPLICATION_CREDENTIALS = os.environ.get(
     'GOOGLE_APPLICATION_CREDENTIALS')
 
