@@ -15,8 +15,9 @@ GOOGLE_APPLICATION_CREDENTIALS = os.environ.get(
 
 def ingest(event, context):
     """Get Client Config."""
-    path_parts = context.resource.split('/documents/')[1].split('/')
+    path_parts = context['resource'].split('/documents/')[1].split('/')
     Client_Id = path_parts[0]
+    file_type = path_parts[2]
 
     firestore_client = firestore.Client()
 
@@ -34,7 +35,7 @@ def ingest(event, context):
     """Get file list."""
     client_doc = firestore_client.collection(Client_Id).document('fileStore')
 
-    files = client_doc.collection('songSpecial').stream()
+    files = client_doc.collection(file_type).stream()
     FileList = {}
     for file in files:
         FileList.update({file.id: file.to_dict()})
