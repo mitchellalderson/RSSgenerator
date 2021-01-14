@@ -11,6 +11,10 @@ XML_Upload_Location = 'elfpodxml'
 Channel_Author = 'Mitch Alderson'
 Itunes_Author = 'Mitch Alderson'
 XML_Name = 'mitchpodcastrss.xml'
+fileTypes = ['podcast', 'podcast2']
+
+###############################################
+
 GOOGLE_APPLICATION_CREDENTIALS = os.environ.get(
     'GOOGLE_APPLICATION_CREDENTIALS')
 
@@ -27,7 +31,7 @@ doc_write.set({
     u'Channel_Author': {
         'name': Channel_Author
     },
-    u'fileTypes': ['podcast', 'podcast2'],
+    u'fileTypes': fileTypes,
     u'Itunes_Author': Itunes_Author,
     u'XML_Name': XML_Name,
 })
