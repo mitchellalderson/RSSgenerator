@@ -27,6 +27,7 @@ doc_write.set({
     u'Channel_Author': {
         'name': Channel_Author
     },
+    u'fileTypes': ['podcast', 'podcast2'],
     u'Itunes_Author': Itunes_Author,
     u'XML_Name': XML_Name,
 })
