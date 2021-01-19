@@ -12,7 +12,7 @@ context = {
     'event_type':
     'providers/cloud.firestore/eventTypes/document.write',
     'resource':
-    'projects/rsscreatortest/databases/(default)/documents/mitchpodcast/fileStore/songSpecial/broken-shovel.mp3'
+    'projects/rsscreatortest/databases/(default)/documents/mitchpodcast/fileStore/podcast/broken-shovel.mp3'
 }
 
 ingest(test1, context)

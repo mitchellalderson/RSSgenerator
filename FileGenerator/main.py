@@ -15,7 +15,8 @@ GOOGLE_APPLICATION_CREDENTIALS = os.environ.get(
 
 def ingest(event, context):
     """Get Client Config."""
-    path_parts = context.resource.split('/documents/')[1].split('/')
+    path = context.resource
+    path_parts = path.split('/documents/')[1].split('/')
     Client_Id = path_parts[0]
     file_type = path_parts[2]
 
@@ -24,14 +25,12 @@ def ingest(event, context):
     client_config = firestore_client.collection(Client_Id).document(
         'config').get()
     Client_URL = client_config._data['Client_URL']
-    Channel_Title = client_config._data['Channel_Title']
-    Logo_URL = client_config._data['Logo_URL']
-    Channel_Subtitle = client_config._data['Channel_Subtitle']
-    Itunes_Category = client_config._data['Itunes_Category']
     XML_Upload_Location = client_config._data['XML_Upload_Location']
     Channel_Author = client_config._data['Channel_Author']
     Itunes_Author = client_config._data['Itunes_Author']
-    XML_Name = client_config._data['XML_Name']
+    podConfig = client_config._data['fileTypes'][file_type]
+
+    test = podConfig['Channel_Subtitle']
     """Get file list."""
     client_doc = firestore_client.collection(Client_Id).document('fileStore')
 
@@ -44,16 +43,16 @@ def ingest(event, context):
     fg = FeedGenerator()
     fg.load_extension('podcast')
     fg.id(Client_URL)
-    fg.title(Channel_Title)
+    fg.title(podConfig['Channel_Title'])
     fg.author(Channel_Author)
     fg.link(href=Client_URL, rel='alternate')
-    fg.logo(Logo_URL)
-    fg.subtitle(Channel_Subtitle)
+    fg.logo(podConfig['Logo_URL'])
+    fg.subtitle(podConfig['Channel_Subtitle'])
     fg.link(href=Client_URL, rel='self')
     fg.language('en')
     fg.generator('Faraway Southwest RSS Generator')
     fg.podcast.itunes_explicit('no')
-    fg.podcast.itunes_category(Itunes_Category)
+    fg.podcast.itunes_category(podConfig['Itunes_Category'])
     fg.podcast.itunes_author(Itunes_Author)
 
     #atomfeed = fg.atom_str(pretty=True)  # Get the ATOM feed as string
@@ -74,8 +73,9 @@ def ingest(event, context):
 
     storage_client = storage.Client()
 
-    uploadBucket = storage_client.bucket(XML_Upload_Location)
-    uploadBlob = uploadBucket.blob(XML_Name)
+    uploadBucket = storage_client.bucket(
+        client_config._data['XML_Upload_Location'])
+    uploadBlob = uploadBucket.blob(podConfig['XML_Name'])
 
     localUploadFile = tempfile.NamedTemporaryFile(suffix='.xml')
     localUploadFile.write(bytes(rssfeed))
