@@ -15,8 +15,8 @@ GOOGLE_APPLICATION_CREDENTIALS = os.environ.get(
 
 def ingest(event, context):
     """Get Client Config."""
-    path = context.resource
-    path_parts = path.split('/documents/')[1].split('/')
+    path = context[resource]
+    path_parts = context.resource.split('/documents/')[1].split('/')
     Client_Id = path_parts[0]
     file_type = path_parts[2]
 
