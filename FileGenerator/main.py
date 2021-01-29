@@ -38,7 +38,7 @@ def ingest(event, context):
 
     for blob in blobs:
 
-        doc_ref = client_doc.collection('songSpecial').document(blob.name)
+        doc_ref = client_doc.collection(bucket_name).document(blob.name)
         doc = doc_ref.get()
         if doc.exists:
             print(blob.name + " song already logged")
@@ -69,7 +69,7 @@ def ingest(event, context):
             LocalFile.close()
             os.unlink(LocalFile.name)
 
-    files = client_doc.collection('songSpecial').stream()
+    files = client_doc.collection(bucket_name).stream()
     FileList = {}
     for file in files:
         FileList.update({file.id: file.to_dict()})
